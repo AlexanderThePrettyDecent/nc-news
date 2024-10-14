@@ -4,4 +4,4 @@ function getEndpoints(request, response) {
   response.status(200).send({ endpoints });
 }
 
-module.exports = { getEndpoints };
+module.exports = getEndpoints;
