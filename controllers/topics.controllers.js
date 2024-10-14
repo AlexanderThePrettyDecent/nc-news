@@ -1,4 +1,4 @@
-const { selectAllTopics } = require("../models/topics.models");
+const { selectAllTopics } = require("../models/index");
 
 function getAllTopics(request, response, next) {
   selectAllTopics()
@@ -10,4 +10,4 @@ function getAllTopics(request, response, next) {
     });
 }
 
-module.exports = { getAllTopics };
+module.exports = getAllTopics;
