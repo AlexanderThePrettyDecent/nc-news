@@ -34,6 +34,7 @@ describe("api/topics", () => {
         .expect(200)
         .then((response) => {
           const topics = response.body.topics;
+          expect(response.body.topics.length).toBe(3);
           topics.forEach((topic) => {
             expect(topic).toMatchObject({
               slug: expect.any(String),
