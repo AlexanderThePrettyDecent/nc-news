@@ -5,6 +5,7 @@ const seed = require("../db/seeds/seed.js");
 const app = require("../app");
 const connection = require("../db/connection.js");
 const endpoints = require("../endpoints.json");
+require("jest-sorted");
 
 beforeAll(() => {
   return seed(data);
@@ -81,6 +82,43 @@ describe("/api/articles", () => {
         .then((results) => {
           expect(results.body.msg).toBe("not found");
         });
+    });
+  });
+  describe("GET-/api/articles", () => {
+    describe("200-endpoint responds with an array of article objects", () => {
+      test("array includes the correct number of objects of the correct format, i.e excluding body (ignoring comment_count)", () => {
+        return request(app)
+          .get("/api/articles/")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(13);
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+              });
+            });
+          });
+      });
+      test("array of articles is sorted by date in descending order", () => {
+        return request(app)
+          .get("/api/articles/")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles).toBeSorted({
+              key: "created_at",
+              descending: true,
+            });
+          });
+      });
     });
   });
 });
