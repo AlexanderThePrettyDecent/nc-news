@@ -1,4 +1,3 @@
-const { openEndpoints } = require("../models/api.models");
 const endpoints = require("../endpoints.json");
 
 function getEndpoints(request, response) {
