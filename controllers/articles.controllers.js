@@ -1,4 +1,9 @@
-const { selectArticlesId, selectAllArticles } = require("../models/index");
+const comments = require("../db/data/test-data/comments");
+const {
+  selectArticlesId,
+  selectAllArticles,
+  selectCommentsFromArticle,
+} = require("../models/index");
 
 function getArticlesId(request, response, next) {
   const articleID = request.params.article_id;
@@ -12,11 +17,20 @@ function getArticlesId(request, response, next) {
 function getAllArticles(request, response, next) {
   return selectAllArticles()
     .then((results) => {
-      response.status(200).send({ articles: results});
+      response.status(200).send({ articles: results });
     })
     .catch((err) => {
       next(err);
     });
 }
 
-module.exports = { getArticlesId, getAllArticles };
+function getCommentsFromArticle(request, response, next) {
+  const articleID = request.params.article_id;
+  return selectCommentsFromArticle(articleID)
+    .then((results) => {
+      response.status(200).send({ comments: results });
+    })
+    .catch((err) => next(err));
+}
+
+module.exports = { getArticlesId, getAllArticles, getCommentsFromArticle };
