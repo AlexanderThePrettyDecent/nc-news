@@ -40,4 +40,27 @@ function selectAllArticles() {
     });
 }
 
-module.exports = { selectArticlesId, selectAllArticles };
+function selectCommentsFromArticle(articleID) {
+  if (!/^[0-9]+$/.test(articleID)) {
+    return Promise.reject({ status: 400, msg: "invalid id" });
+  }
+  return db
+    .query(
+      `SELECT * FROM comments
+        WHERE article_id = ${articleID}
+        ORDER BY created_at DESC`
+    )
+    .then((results) => {
+      if (!selectArticlesId(articleID)) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+
+      return results.rows;
+    });
+}
+
+module.exports = {
+  selectArticlesId,
+  selectAllArticles,
+  selectCommentsFromArticle,
+};
