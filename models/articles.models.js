@@ -59,8 +59,29 @@ function selectCommentsFromArticle(articleID) {
     });
 }
 
+function insertCommentToArticle(articleID, requestBody) {
+  if (!/^[0-9]+$/.test(articleID)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  return db
+    .query(
+      `INSERT INTO comments
+      (author, body, article_id)
+      VALUES
+      ($1, $2, $3) RETURNING *`,
+      [requestBody.username, requestBody.body, articleID]
+    )
+    .then((results) => {
+      if (!selectArticlesId(articleID)) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return results.rows;
+    });
+}
+
 module.exports = {
   selectArticlesId,
   selectAllArticles,
   selectCommentsFromArticle,
+  insertCommentToArticle,
 };

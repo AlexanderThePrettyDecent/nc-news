@@ -1,12 +1,21 @@
-function serverError(err, req, res, nest) {
-  res.status(500).send({ error: err, msg: "internal server error" });
+const { response } = require("./app");
+
+function serverError(error, request, response, next) {
+  response.status(500).send({ error: error, msg: "internal server error" });
 }
 
-function customError(err, req, res, nest) {
-  if (err.status && err.msg) {
-    res.status(err.status).send({ msg: err.msg });
+function customError(error, request, response, next) {
+  if (error.status && error.msg) {
+    response.status(error.status).send({ msg: error.msg });
   }
-  next(err);
+  next(error);
 }
 
-module.exports = { serverError, customError };
+function psqlError(error, request, response, next) {
+  if (error.code === "23502") {
+    response.status(404).send({ msg: "not found" });
+  }
+  else next(error);
+}
+
+module.exports = { serverError, customError, psqlError };
