@@ -119,6 +119,19 @@ describe("/api/articles", () => {
             });
           });
       });
+      test("article objects include a comment_count property with the number of comments on that article as its value", () => {
+        return request(app)
+          .get("/api/articles/")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                comment_count: expect.any(String),
+              });
+            });
+          });
+      });
     });
   });
 });
