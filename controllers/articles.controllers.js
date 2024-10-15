@@ -3,6 +3,7 @@ const {
   selectArticlesId,
   selectAllArticles,
   selectCommentsFromArticle,
+  insertCommentToArticle,
 } = require("../models/index");
 
 function getArticlesId(request, response, next) {
@@ -33,4 +34,21 @@ function getCommentsFromArticle(request, response, next) {
     .catch((err) => next(err));
 }
 
-module.exports = { getArticlesId, getAllArticles, getCommentsFromArticle };
+function postCommentToArticle(request, response, next) {
+  const articleID = request.params.article_id;
+  const requestBody = request.body;
+  return insertCommentToArticle(articleID, requestBody)
+    .then((results) => {
+      response.status(201).send({ comment: results[0] });
+    })
+    .catch((err) => {
+      return next(err);
+    });
+}
+
+module.exports = {
+  getArticlesId,
+  getAllArticles,
+  getCommentsFromArticle,
+  postCommentToArticle,
+};

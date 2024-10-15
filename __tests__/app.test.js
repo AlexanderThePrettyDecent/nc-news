@@ -141,6 +141,7 @@ describe("/api/articles", () => {
         .expect(200)
         .then((response) => {
           const comments = response.body.comments;
+          //console.log(comments)
           expect(response.body.comments.length).toBe(11);
           expect(comments).toBeSorted({
             key: "created_at",
@@ -182,6 +183,69 @@ describe("/api/articles", () => {
         .expect(404)
         .then((results) => {
           expect(results.body.msg).toBe("not found");
+        });
+    });
+  });
+  describe("POST-/api/articles/:article_id/comments", () => {
+    test("201-endpoint accepts a body containing a username and comment body, adds an entry to the comments table and responds with the newly added comment", () => {
+      const requestBody = {
+        username: "butter_bridge",
+        commentBody: "It hasn't got better",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+          username: "butter_bridge",
+          body: "It hasn't got better",
+        })
+        .expect(201)
+        .then((results) => {
+          expect(results.body.comment).toMatchObject({
+            body: "It hasn't got better",
+            votes: 0,
+            author: "butter_bridge",
+            article_id: 1,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("404-endpoint responds with 'not found' if specified user is non-existant", () => {
+      const requestBody = {
+        username: "bobby botox",
+        commentBody: "It hasn't got better",
+      };
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send(requestBody)
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("404-endpoint responds with 'not found' if specified article is non-existant", () => {
+      const requestBody = {
+        username: "butter_bridge",
+        commentBody: "It hasn't got better",
+      };
+      return request(app)
+        .post("/api/articles/10000000/comments")
+        .send(requestBody)
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("400-endpoint responds with 'bad request' article id is not valid", () => {
+      const requestBody = {
+        username: "butter_bridge",
+        commentBody: "It hasn't got better",
+      };
+      return request(app)
+        .post("/api/articles/notanarticle/comments")
+        .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
         });
     });
   });

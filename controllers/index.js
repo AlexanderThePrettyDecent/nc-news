@@ -1,4 +1,4 @@
 const getEndpoints = require("./api.controllers");
-const { getArticlesId, getAllArticles, getCommentsFromArticle } = require("./articles.controllers");
+const { getArticlesId, getAllArticles, getCommentsFromArticle, postCommentToArticle } = require("./articles.controllers");
 const getAllTopics = require("./topics.controllers");
-module.exports = { getArticlesId, getAllTopics, getEndpoints, getAllArticles, getCommentsFromArticle };
+module.exports = { getArticlesId, getAllTopics, getEndpoints, getAllArticles, getCommentsFromArticle, postCommentToArticle };
