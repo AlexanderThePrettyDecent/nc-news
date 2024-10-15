@@ -188,10 +188,6 @@ describe("/api/articles", () => {
   });
   describe("POST-/api/articles/:article_id/comments", () => {
     test("201-endpoint accepts a body containing a username and comment body, adds an entry to the comments table and responds with the newly added comment", () => {
-      const requestBody = {
-        username: "butter_bridge",
-        commentBody: "It hasn't got better",
-      };
       return request(app)
         .post("/api/articles/1/comments")
         .send({
@@ -243,6 +239,63 @@ describe("/api/articles", () => {
       return request(app)
         .post("/api/articles/notanarticle/comments")
         .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("PATCH-api/articles/:article_id", () => {
+    test("200-endpoint increases/decreases vote count of specified article by the quantity included in the request body", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then((results) => {
+          expect(results.body.article).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 101,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    test("400-endpoint responds with 'bad request' when vote amount is not valid", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "cat" })
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' when article ID is not valid", () => {
+      return request(app)
+        .patch("/api/articles/ARRRGGGG")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("404-endpoint responds with 'not found' when article ID is valid but non-existant", () => {
+      return request(app)
+        .patch("/api/articles/111111111111111")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("400-endpoint responds with 'bad request' when request body does not include inc_votes", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({})
         .expect(400)
         .then((results) => {
           expect(results.body.msg).toBe("bad request");

@@ -4,6 +4,7 @@ const {
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
+  updateArticleVotes,
 } = require("../models/index");
 
 function getArticlesId(request, response, next) {
@@ -46,9 +47,22 @@ function postCommentToArticle(request, response, next) {
     });
 }
 
+function patchArticleVotes(request, response, next) {
+  const articleID = request.params.article_id;
+  const requestBody = request.body;
+  return updateArticleVotes(articleID, requestBody)
+    .then((results) => {
+      response.status(200).send({ article: results[0] });
+    })
+    .catch((err) => {
+      return next(err);
+    });
+}
+
 module.exports = {
   getArticlesId,
   getAllArticles,
   getCommentsFromArticle,
   postCommentToArticle,
+  patchArticleVotes,
 };
