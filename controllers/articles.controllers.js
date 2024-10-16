@@ -5,6 +5,7 @@ const {
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
+  deleteComment,
 } = require("../models/index");
 
 function getArticlesId(request, response, next) {
@@ -59,10 +60,22 @@ function patchArticleVotes(request, response, next) {
     });
 }
 
+function deleteCommentByID(request, response, next) {
+  const commentID = request.params.comment_id;
+  return deleteComment(commentID)
+    .then(() => {
+      response.status(204).send();
+    })
+    .catch((err) => {
+      return next(err);
+    });
+}
+
 module.exports = {
   getArticlesId,
   getAllArticles,
   getCommentsFromArticle,
   postCommentToArticle,
   patchArticleVotes,
+  deleteCommentByID
 };

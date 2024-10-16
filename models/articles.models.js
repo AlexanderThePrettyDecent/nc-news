@@ -92,10 +92,21 @@ function updateArticleVotes(articleID, requestBody) {
     });
 }
 
+function deleteComment(commentID) {
+  return db
+    .query(
+      `DELETE FROM comments
+    WHERE comment_id = $1
+    RETURNING *;`,
+      [commentID]
+    )
+}
+
 module.exports = {
   selectArticlesId,
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
+  deleteComment,
 };
