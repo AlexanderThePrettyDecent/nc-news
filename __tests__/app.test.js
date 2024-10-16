@@ -85,6 +85,7 @@ describe("/api/articles", () => {
     });
   });
   describe("GET-/api/articles", () => {
+
     describe("200-endpoint responds with an array of article objects", () => {
       test("array includes the correct number of objects of the correct format, i.e excluding body (ignoring comment_count)", () => {
         return request(app)
@@ -108,7 +109,7 @@ describe("/api/articles", () => {
             });
           });
       });
-      test("array of articles is sorted by date in descending order", () => {
+      test("array of articles is sorted by date in descending order by default", () => {
         return request(app)
           .get("/api/articles/")
           .expect(200)
@@ -120,6 +121,47 @@ describe("/api/articles", () => {
             });
           });
       });
+      test("array of articles is sorted in the order specified in the query", () => {
+        return request(app)
+          .get("/api/articles/?sort_order=ASC")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles).toBeSorted({
+              key: "created_at",
+              descending: false,
+            });
+          });
+      });
+      test("array of articles is by the column specified in the query", () => {
+        return request(app)
+          .get("/api/articles/?sort_order=ASC&sort_by=comment_count")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles).toBeSorted({
+              key: "comment_count",
+              descending: false,
+              coerce: true
+            });
+          });
+      });
+    test("400-endpoint responds with 'bad request' if queried order is invalid",()=>{
+      return request(app)
+          .get("/api/articles/?sort_order=EATMYSHORTS")
+          .expect(400)
+          .then((response) => {
+            expect(response.body.msg).toBe("bad request")
+          });
+    });
+    test("400-endpoint responds with 'bad request' if queried sort column is invalid",()=>{
+      return request(app)
+          .get("/api/articles/?sort_order=DESC%sort_by=salmon")
+          .expect(400)
+          .then((response) => {
+            expect(response.body.msg).toBe("bad request")
+          });
+    })
     });
   });
   describe("GET-/api/articles/:article_id/comments", () => {

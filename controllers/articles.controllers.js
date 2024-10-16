@@ -18,7 +18,8 @@ function getArticlesId(request, response, next) {
 }
 
 function getAllArticles(request, response, next) {
-  return selectAllArticles()
+  const {sort_order, sort_by} = request.query
+  return selectAllArticles(sort_order, sort_by)
     .then((results) => {
       response.status(200).send({ articles: results });
     })
@@ -59,8 +60,6 @@ function patchArticleVotes(request, response, next) {
       return next(err);
     });
 }
-
-
 
 module.exports = {
   getArticlesId,
