@@ -15,7 +15,26 @@ function selectArticlesId(articleID) {
     });
 }
 
-function selectAllArticles() {
+function selectAllArticles(sortOrder = "DESC", sortBy = "created_at") {
+  const validOrders = ["ASC", "DESC"];
+  const validSortBy = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  if (!validOrders.includes(sortOrder)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  if (!validSortBy.includes(sortBy)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  if (!sortBy === "comment_count") {
+    sortBy === `articles.${sortBy}`;
+  }
   return db
     .query(
       `
@@ -31,7 +50,7 @@ function selectAllArticles() {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY created_at DESC`
+        ORDER BY ${sortBy} ${sortOrder}`
     )
     .then((results) => {
       return results.rows;
@@ -91,8 +110,6 @@ function updateArticleVotes(articleID, requestBody) {
       return results.rows;
     });
 }
-
-
 
 module.exports = {
   selectArticlesId,
