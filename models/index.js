@@ -4,10 +4,9 @@ const {
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
-
 } = require("./articles.models");
 const { deleteComment } = require("./comments.models");
-const selectAllTopics = require("./topics.models");
+const { selectAllTopics } = require("./topics.models");
 const { selectAllUsers } = require("./users.models");
 module.exports = {
   selectArticlesId,
@@ -17,5 +16,5 @@ module.exports = {
   insertCommentToArticle,
   updateArticleVotes,
   deleteComment,
-  selectAllUsers
+  selectAllUsers,
 };

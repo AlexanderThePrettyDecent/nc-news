@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { selectTopicSlug } = require("./topics.models");
 
 function selectArticlesId(articleID) {
   return db
@@ -15,7 +16,7 @@ function selectArticlesId(articleID) {
     });
 }
 
-function selectAllArticles(sortOrder = "DESC", sortBy = "created_at") {
+function selectAllArticles(sortOrder = "DESC", sortBy = "created_at", topic) {
   const validOrders = ["ASC", "DESC"];
   const validSortBy = [
     "author",
@@ -35,6 +36,12 @@ function selectAllArticles(sortOrder = "DESC", sortBy = "created_at") {
   if (!sortBy === "comment_count") {
     sortBy === `articles.${sortBy}`;
   }
+  let where = ` `;
+  const insertArr = [];
+  if (topic) {
+    where = " WHERE topic=$1 ";
+    insertArr.push(topic);
+  }
   return db
     .query(
       `
@@ -49,10 +56,15 @@ function selectAllArticles(sortOrder = "DESC", sortBy = "created_at") {
           COUNT(comments.comment_id) AS comment_count
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
+        ${where}
         GROUP BY articles.article_id
-        ORDER BY ${sortBy} ${sortOrder}`
+        ORDER BY ${sortBy} ${sortOrder}`,
+      insertArr
     )
     .then((results) => {
+      if (results.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
       return results.rows;
     });
 }

@@ -85,7 +85,6 @@ describe("/api/articles", () => {
     });
   });
   describe("GET-/api/articles", () => {
-
     describe("200-endpoint responds with an array of article objects", () => {
       test("array includes the correct number of objects of the correct format, i.e excluding body (ignoring comment_count)", () => {
         return request(app)
@@ -142,26 +141,40 @@ describe("/api/articles", () => {
             expect(articles).toBeSorted({
               key: "comment_count",
               descending: false,
-              coerce: true
+              coerce: true,
             });
           });
       });
-    test("400-endpoint responds with 'bad request' if queried order is invalid",()=>{
-      return request(app)
-          .get("/api/articles/?sort_order=EATMYSHORTS")
-          .expect(400)
+      test("array includes only articles of the topic specified in the query)", () => {
+        return request(app)
+          .get("/api/articles/?topic=mitch")
+          .expect(200)
           .then((response) => {
-            expect(response.body.msg).toBe("bad request")
+            const articles = response.body.articles;
+            expect(articles.length).toBe(12);
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                topic: "mitch",
+              });
+            });
           });
+      });
     });
-    test("400-endpoint responds with 'bad request' if queried sort column is invalid",()=>{
+    test("400-endpoint responds with 'bad request' if queried order is invalid", () => {
       return request(app)
-          .get("/api/articles/?sort_order=DESC%sort_by=salmon")
-          .expect(400)
-          .then((response) => {
-            expect(response.body.msg).toBe("bad request")
-          });
-    })
+        .get("/api/articles/?sort_order=EATMYSHORTS")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' if queried sort column is invalid", () => {
+      return request(app)
+        .get("/api/articles/?sort_order=DESC%sort_by=salmon")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("bad request");
+        });
     });
   });
   describe("GET-/api/articles/:article_id/comments", () => {
