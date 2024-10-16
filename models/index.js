@@ -3,6 +3,7 @@ const {
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
+  updateArticleVotes,
 } = require("./articles.models");
 const selectAllTopics = require("./topics.models");
 module.exports = {
@@ -11,4 +12,5 @@ module.exports = {
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
+  updateArticleVotes,
 };

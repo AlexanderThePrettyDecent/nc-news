@@ -79,9 +79,30 @@ function insertCommentToArticle(articleID, requestBody) {
     });
 }
 
+function updateArticleVotes(articleID, requestBody) {
+  if (!requestBody.inc_votes){
+    return Promise.reject({ status: 400, msg: "bad request" })
+  }
+  return db
+    .query(
+      `UPDATE articles
+      SET votes = votes + $1
+      WHERE article_id = $2
+      RETURNING *;`,
+      [requestBody.inc_votes, articleID]
+    )
+    .then((results) => {
+      if (!selectArticlesId(articleID)) {
+        return Promise.reject({ status: 404, msg: "not found" });
+      }
+      return results.rows;
+    });
+}
+
 module.exports = {
   selectArticlesId,
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
+  updateArticleVotes,
 };

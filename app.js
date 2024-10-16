@@ -6,6 +6,7 @@ const {
   getAllArticles,
   getCommentsFromArticle,
   postCommentToArticle,
+  patchArticleVotes,
 } = require("./controllers");
 const { serverError, customError, psqlError } = require("./errorHandlers");
 require;
@@ -26,6 +27,7 @@ app.get("/api/articles/:article_id/comments", getCommentsFromArticle);
 
 app.post("/api/articles/:article_id/comments", postCommentToArticle);
 
+app.patch("/api/articles/:article_id", patchArticleVotes);
 app.use(customError);
 
 app.use(psqlError);

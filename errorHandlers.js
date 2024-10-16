@@ -12,10 +12,11 @@ function customError(error, request, response, next) {
 }
 
 function psqlError(error, request, response, next) {
-  if (error.code === "23502") {
+  if (error.code === "23502" || error.code === "22003") {
     response.status(404).send({ msg: "not found" });
-  }
-  else next(error);
+  } else if (error.code === "22P02") {
+    response.status(400).send({ msg: "bad request" });
+  } else next(error);
 }
 
 module.exports = { serverError, customError, psqlError };
