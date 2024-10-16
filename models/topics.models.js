@@ -6,4 +6,4 @@ function selectAllTopics() {
   });
 }
 
-module.exports = selectAllTopics;
+module.exports = { selectAllTopics };

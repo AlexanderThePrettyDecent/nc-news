@@ -5,7 +5,6 @@ const {
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
-  deleteComment,
 } = require("../models/index");
 
 function getArticlesId(request, response, next) {
@@ -18,8 +17,8 @@ function getArticlesId(request, response, next) {
 }
 
 function getAllArticles(request, response, next) {
-  const {sort_order, sort_by} = request.query
-  return selectAllArticles(sort_order, sort_by)
+  const { sort_order, sort_by, topic } = request.query;
+  return selectAllArticles(sort_order, sort_by, topic)
     .then((results) => {
       response.status(200).send({ articles: results });
     })
