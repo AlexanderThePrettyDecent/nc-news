@@ -72,7 +72,7 @@ describe("/api/articles", () => {
         .get("/api/articles/orange")
         .expect(400)
         .then((results) => {
-          expect(results.body.msg).toBe("invalid id");
+          expect(results.body.msg).toBe("bad request");
         });
     });
     test("404-endpoint responds 'not found' if the parameter is a valid ID for a non-existant article", () => {
@@ -103,6 +103,7 @@ describe("/api/articles", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
+                comment_count: expect.any(String),
               });
             });
           });
@@ -116,19 +117,6 @@ describe("/api/articles", () => {
             expect(articles).toBeSorted({
               key: "created_at",
               descending: true,
-            });
-          });
-      });
-      test("article objects include a comment_count property with the number of comments on that article as its value", () => {
-        return request(app)
-          .get("/api/articles/")
-          .expect(200)
-          .then((response) => {
-            const articles = response.body.articles;
-            articles.forEach((article) => {
-              expect(article).toMatchObject({
-                comment_count: expect.any(String),
-              });
             });
           });
       });
@@ -169,12 +157,12 @@ describe("/api/articles", () => {
           expect(Array.isArray(comments)).toBe(true);
         });
     });
-    test("400-endpoint responds 'invalid id' if the parameter is not a valid ID(number)", () => {
+    test("400-endpoint responds 'bad request' if the parameter is not a valid ID(number)", () => {
       return request(app)
         .get("/api/articles/orange/comments")
         .expect(400)
         .then((results) => {
-          expect(results.body.msg).toBe("invalid id");
+          expect(results.body.msg).toBe("bad request");
         });
     });
     test("404-endpoint responds 'not found' if the parameter is a valid ID for a non-existant article", () => {
@@ -197,6 +185,7 @@ describe("/api/articles", () => {
         .expect(201)
         .then((results) => {
           expect(results.body.comment).toMatchObject({
+            comment_id: 19,
             body: "It hasn't got better",
             votes: 0,
             author: "butter_bridge",
