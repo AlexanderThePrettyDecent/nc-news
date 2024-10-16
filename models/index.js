@@ -4,8 +4,9 @@ const {
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
-  deleteComment,
+
 } = require("./articles.models");
+const { deleteComment } = require("./comments.models");
 const selectAllTopics = require("./topics.models");
 const { selectAllUsers } = require("./users.models");
 module.exports = {
