@@ -7,8 +7,8 @@ const {
   getCommentsFromArticle,
   postCommentToArticle,
   patchArticleVotes,
-  deleteCommentByID,
   getAllUsers,
+  deleteCommentByID,
 } = require("./controllers");
 const { serverError, customError, psqlError } = require("./errorHandlers");
 require;
