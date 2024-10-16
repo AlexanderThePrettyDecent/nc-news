@@ -296,26 +296,45 @@ describe("/api/articles", () => {
 describe("/api/comments/", () => {
   describe("DELETE /api/comments/:comment_id", () => {
     test("204-endpoint deletes specified comment", () => {
-      return request(app)
-        .delete("/api/comments/1")
-        .expect(204)
-//cannot send body on a 204 message
+      return request(app).delete("/api/comments/1").expect(204);
+      //cannot send body on a 204 message
     });
-    test("400-endpoint responds with 'bad request' when comment ID is not valid",()=>{
+    test("400-endpoint responds with 'bad request' when comment ID is not valid", () => {
       return request(app)
-          .delete("/api/comments/orange")
-          .expect(400)
-          .then((results) => {
-            expect(results.body.msg).toBe("bad request");
-          });
-    })
-    test("400-endpoint responds with 'not found' when comment ID is valid but non-existant",()=>{
+        .delete("/api/comments/orange")
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'not found' when comment ID is valid but non-existant", () => {
       return request(app)
-          .delete("/api/comments/99999999999")
-          .expect(404)
-          .then((results) => {
-            expect(results.body.msg).toBe("not found");
+        .delete("/api/comments/99999999999")
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+  });
+});
+
+describe("/api/users", () => {
+  describe("GET /api/users", () => {
+    test("200-endpoint responds with an array of user objects", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((response) => {
+          const users = response.body.users;
+          expect(response.body.users.length).toBe(4);
+          users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
           });
-    })
+        });
+    });
   });
 });
