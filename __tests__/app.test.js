@@ -393,4 +393,28 @@ describe("/api/users", () => {
         });
     });
   });
+  describe("GET /api/users/:username", () => {
+    test("200-endpoint returns a user object for user with specifed username", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then((results) => {
+          const user = results.body.user;
+          expect(user).toMatchObject({
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          });
+        });
+    });
+    test("404-endpoint responds 'not found' if the paramter does not correspond to an existing username", () => {
+      return request(app)
+        .get("/api/users/bob")
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+  });
 });
