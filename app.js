@@ -1,10 +1,4 @@
 const express = require("express");
-const {
-  getEndpoints,
-  getAllTopics,
-  getAllUsers,
-  deleteCommentByID,
-} = require("./controllers");
 const { serverError, customError, psqlError } = require("./errorHandlers");
 const {
   articlesRouter,
