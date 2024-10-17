@@ -310,6 +310,25 @@ describe("/api/articles", () => {
           });
         });
     });
+    test("200-endpoint increases/decreases vote count of specified article by the quantity included in the request body when the value is negative", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -1 })
+        .expect(200)
+        .then((results) => {
+          expect(results.body.article).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
     test("400-endpoint responds with 'bad request' when vote amount is not valid", () => {
       return request(app)
         .patch("/api/articles/1")
@@ -369,6 +388,74 @@ describe("/api/comments/", () => {
         .expect(404)
         .then((results) => {
           expect(results.body.msg).toBe("not found");
+        });
+    });
+  });
+  describe("PATCH /api/comments/:comment_id", () => {
+    test("200-endpoint increments the votes of the specified comment by the amount specified in the inc_votes property of the body", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then((results) => {
+          expect(results.body.comment).toMatchObject({
+            body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            votes: 15,
+            author: "butter_bridge",
+            article_id: 1,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("200-endpoint increments the votes of the specified comment by the amount specified in the inc_votes property of the body when specifed value is negative", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: -1 })
+        .expect(200)
+        .then((results) => {
+          expect(results.body.comment).toMatchObject({
+            body: "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+            votes: 14,
+            author: "butter_bridge",
+            article_id: 1,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("400-endpoint responds with 'bad request' when vote amount is not valid", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({ inc_votes: "cat" })
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' when comment ID is not valid", () => {
+      return request(app)
+        .patch("/api/comments/ARRRGGGG")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("404-endpoint responds with 'not found' when comment ID is valid but non-existant", () => {
+      return request(app)
+        .patch("/api/comments/111111111111111")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("400-endpoint responds with 'bad request' when request body does not include inc_votes", () => {
+      return request(app)
+        .patch("/api/comments/2")
+        .send({})
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
         });
     });
   });
