@@ -185,7 +185,6 @@ describe("/api/articles", () => {
         .expect(200)
         .then((response) => {
           const comments = response.body.comments;
-          //console.log(comments)
           expect(response.body.comments.length).toBe(11);
           expect(comments).toBeSorted({
             key: "created_at",
@@ -290,7 +289,7 @@ describe("/api/articles", () => {
         });
     });
   });
-  describe("PATCH-api/articles/:article_id", () => {
+  describe("PATCH-/api/articles/:article_id", () => {
     test("200-endpoint increases/decreases vote count of specified article by the quantity included in the request body", () => {
       return request(app)
         .patch("/api/articles/1")
@@ -363,6 +362,158 @@ describe("/api/articles", () => {
         .expect(400)
         .then((results) => {
           expect(results.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("POST-/api/articles", () => {
+    test("201-endpoint creates a new article from the variables provided in the body", () => {
+      return request(app)
+        .post("/api/articles/")
+        .send({
+          author: "rogersop",
+          topic: "mitch",
+          title: "The impact of our saviour on geopolitcs: any essay",
+          body: "Mitch has provided world peace and universal prosperity. We are thankful",
+          article_img_url:
+            "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+        })
+        .expect(201)
+        .then((results) => {
+          expect(results.body.article).toMatchObject({
+            article_id: 14,
+            title: "The impact of our saviour on geopolitcs: any essay",
+            topic: "mitch",
+            author: "rogersop",
+            body: "Mitch has provided world peace and universal prosperity. We are thankful",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+            comment_count: 0,
+          });
+        });
+    });
+    test("404-endpoint responds with 'not found' if specified author is non-existant", () => {
+      const requestBody = {
+        author: "rogersop",
+        topic: "camels",
+        title: "The impact of our saviour on geopolitcs: any essay",
+        body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("404-endpoint responds with 'not found' if specified topic is non-existant", () => {
+      const requestBody = {
+        author: "oogabooga",
+        topic: "mitch",
+        title: "The impact of our saviour on geopolitcs: any essay",
+        body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(404)
+        .then((results) => {
+          expect(results.body.msg).toBe("not found");
+        });
+    });
+    test("400-endpoint responds with 'bad request' if no author specified", () => {
+      const requestBody = {
+        topic: "mitch",
+        title: "The impact of our saviour on geopolitcs: any essay",
+        body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' if no title specified", () => {
+      const requestBody = {
+        author: "rogersop",
+        topic: "mitch",
+        body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' if no topic specified", () => {
+      const requestBody = {
+        author: "rogersop",
+        title: "The impact of our saviour on geopolitcs: any essay",
+        body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("400-endpoint responds with 'bad request' if no body specified", () => {
+      const requestBody = {
+        author: "rogersop",
+        title: "The impact of our saviour on geopolitcs: any essay",
+        topic: "mitch",
+        article_img_url:
+          "https://i.swncdn.com/media/400w/via/images/2024/06/19/36454/36454-god-in-storm-clouds_source_file.jpg",
+      };
+      return request(app)
+        .post("/api/articles/")
+        .send(requestBody)
+        .expect(400)
+        .then((results) => {
+          expect(results.body.msg).toBe("bad request");
+        });
+    });
+    test("201-endpoint creates a new article from the variables provided in the body if no image url is specified", () => {
+      return request(app)
+        .post("/api/articles/")
+        .send({
+          author: "rogersop",
+          topic: "mitch",
+          title: "The impact of our saviour on geopolitcs: any essay",
+          body: "Mitch has provided world peace and universal prosperity. We are thankful",
+        })
+        .expect(201)
+        .then((results) => {
+          expect(results.body.article).toMatchObject({
+            article_id: 17,
+            title: "The impact of our saviour on geopolitcs: any essay",
+            topic: "mitch",
+            author: "rogersop",
+            body: "Mitch has provided world peace and universal prosperity. We are thankful",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://static.wikia.nocookie.net/epicmeme/images/c/c4/JermaSus.png/revision/latest/scale-to-width-down/843?cb=20201230153850",
+            comment_count: 0,
+          });
         });
     });
   });

@@ -5,6 +5,7 @@ const {
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
+  insertArticle,
 } = require("../models/index");
 
 function getArticlesId(request, response, next) {
@@ -60,10 +61,22 @@ function patchArticleVotes(request, response, next) {
     });
 }
 
+function postArticle(request, response, next) {
+  const requestBody = request.body;
+  return insertArticle(requestBody)
+    .then((results) => {
+      response.status(201).send({ article: results[0] });
+    })
+    .catch((err) => {
+      return next(err);
+    });
+}
+
 module.exports = {
   getArticlesId,
   getAllArticles,
   getCommentsFromArticle,
   postCommentToArticle,
   patchArticleVotes,
+  postArticle,
 };

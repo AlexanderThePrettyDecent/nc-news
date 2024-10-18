@@ -116,5 +116,29 @@
         "created_at": "2020-10-31T03:03:00.000Z"
       }
     }
+  },
+  "POST /api/articles": {
+    "description": "post a new article using the information specified in the body. Article_img_url defaults to this image:https://static.wikia.nocookie.net/epicmeme/images/c/c4/JermaSus.png/revision/latest/scale-to-width-down/843?cb=20201230153850",
+    "exampleBody": {
+      "title": "Living in the shadow of a great man",
+      "topic": "mitch",
+      "author": "butter_bridge",
+      "body": "I find this existence challenging",
+      "created_at": "2020-07-09T20:11:00.000Z",
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 0,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        "comment_count": 0
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ const {
   getCommentsFromArticle,
   postCommentToArticle,
   patchArticleVotes,
+  postArticle,
 } = require("./articles.controllers");
 const {
   deleteCommentByID,
@@ -24,4 +25,5 @@ module.exports = {
   deleteCommentByID,
   getUserByUsername,
   patchCommentVotes,
+  postArticle,
 };

@@ -134,10 +134,34 @@ function updateArticleVotes(articleID, requestBody) {
     });
 }
 
+function insertArticle(requestBody) {
+  let { author, topic, title, body, article_img_url } = requestBody;
+  if (!author || !topic || !title || !body) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+  if (!article_img_url) {
+    article_img_url =
+      "https://static.wikia.nocookie.net/epicmeme/images/c/c4/JermaSus.png/revision/latest/scale-to-width-down/843?cb=20201230153850";
+  }
+  return db
+    .query(
+      `INSERT INTO articles
+      (author, body, topic, article_img_url, title)
+      VALUES
+      ($1, $2, $3, $4, $5) RETURNING *`,
+      [author, body, topic, article_img_url, title]
+    )
+    .then((results) => {
+      results.rows[0].comment_count = 0;
+      return results.rows;
+    });
+}
+
 module.exports = {
   selectArticlesId,
   selectAllArticles,
   selectCommentsFromArticle,
   insertCommentToArticle,
   updateArticleVotes,
+  insertArticle,
 };
