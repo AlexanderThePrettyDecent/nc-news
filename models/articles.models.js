@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { selectTopicBySlug } = require("./topics.models");
 
 function selectArticlesId(articleID) {
   return db
@@ -117,7 +118,12 @@ function selectAllArticles(
     })
     .then((results) => {
       if (results[0].rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "not found" });
+        return selectTopicBySlug(topic).then((results) => {
+          if (results[0]) {
+            return { articles: [], total_count: 0 };
+          }
+          return Promise.reject({ status: 404, msg: "not found" });
+        });
       }
       const totalCount = results[1][0].total_count;
       const articles = results[0].rows;
