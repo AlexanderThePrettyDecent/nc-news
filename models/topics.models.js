@@ -6,4 +6,12 @@ function selectAllTopics() {
   });
 }
 
-module.exports = { selectAllTopics };
+function selectTopicBySlug(slug) {
+  return db
+    .query(`SELECT slug, description FROM topics WHERE slug = $1`, [slug])
+    .then((results) => {
+      return results.rows;
+    });
+}
+
+module.exports = { selectAllTopics, selectTopicBySlug };

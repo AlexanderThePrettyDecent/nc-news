@@ -275,6 +275,15 @@ describe("/api/articles", () => {
             });
           });
       });
+      test("returns empty array if queried topic exists but contains no articles", () => {
+        return request(app)
+          .get("/api/articles/?topic=paper")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(0);
+          });
+      });
     });
     test("400-endpoint responds with 'bad request' if queried order is invalid", () => {
       return request(app)
@@ -290,6 +299,14 @@ describe("/api/articles", () => {
         .expect(400)
         .then((response) => {
           expect(response.body.msg).toBe("bad request");
+        });
+    });
+    test("404-endpoint responds with 'not found' if queried topic does not exist", () => {
+      return request(app)
+        .get("/api/articles/?topic=cabbages")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("not found");
         });
     });
   });
@@ -638,7 +655,6 @@ describe("/api/comments/", () => {
   describe("DELETE /api/comments/:comment_id", () => {
     test("204-endpoint deletes specified comment", () => {
       return request(app).delete("/api/comments/1").expect(204);
-      //cannot send body on a 204 message
     });
     test("400-endpoint responds with 'bad request' when comment ID is not valid", () => {
       return request(app)
