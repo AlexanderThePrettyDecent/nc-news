@@ -87,13 +87,13 @@ describe("/api/articles", () => {
   });
   describe("GET-/api/articles", () => {
     describe("200-endpoint responds with an array of article objects", () => {
-      test("array includes the correct number of objects of the correct format, i.e excluding body (ignoring comment_count)", () => {
+      test("array includes the correct number of objects of the correct format, i.e excluding body", () => {
         return request(app)
           .get("/api/articles/")
           .expect(200)
           .then((response) => {
             const articles = response.body.articles;
-            expect(articles.length).toBe(13);
+            expect(articles.length).toBe(10);
             articles.forEach((article) => {
               expect(article.body).toBeFalsy();
               expect(article).toMatchObject({
@@ -109,7 +109,7 @@ describe("/api/articles", () => {
             });
           });
       });
-      test("array of articles is sorted by date in descending order by default", () => {
+      test("array of articles is ordered by date in descending order by default", () => {
         return request(app)
           .get("/api/articles/")
           .expect(200)
@@ -121,7 +121,7 @@ describe("/api/articles", () => {
             });
           });
       });
-      test("array of articles is sorted in the order specified in the query", () => {
+      test("array of articles is ordered in the order specified in the query", () => {
         return request(app)
           .get("/api/articles/?sort_order=ASC")
           .expect(200)
@@ -133,7 +133,7 @@ describe("/api/articles", () => {
             });
           });
       });
-      test("array of articles is by the column specified in the query", () => {
+      test("array of articles is ordered by the column specified in the query", () => {
         return request(app)
           .get("/api/articles/?sort_order=ASC&sort_by=comment_count")
           .expect(200)
@@ -148,7 +148,7 @@ describe("/api/articles", () => {
       });
       test("array includes only articles of the topic specified in the query)", () => {
         return request(app)
-          .get("/api/articles/?topic=mitch")
+          .get("/api/articles/?topic=mitch&limit=12")
           .expect(200)
           .then((response) => {
             const articles = response.body.articles;
@@ -156,6 +156,121 @@ describe("/api/articles", () => {
             articles.forEach((article) => {
               expect(article).toMatchObject({
                 topic: "mitch",
+              });
+            });
+          });
+      });
+      test("array contains a single page of articles when a page limit and page number are specified, response also includes a total_count property for all art", () => {
+        return request(app)
+          .get("/api/articles/?limit=6&p=2")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(6);
+            expect(response.body.total_count).toBe("13");
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
+            });
+          });
+      });
+      test("array contains a single page of articles when a page limit and page number are specified, number of articles is equal to total_articles % limit when the final viable page is selected", () => {
+        return request(app)
+          .get("/api/articles/?limit=6&p=3")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(1);
+            expect(response.body.total_count).toBe("13");
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
+            });
+          });
+      });
+      test("if the queried page contains no aritcles defaults to the final page with articles", () => {
+        return request(app)
+          .get("/api/articles/?limit=6&p=15")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(1);
+            expect(response.body.total_count).toBe("13");
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
+            });
+          });
+      });
+      test("if queried page number is below 1 defaults to page 1", () => {
+        return request(app)
+          .get("/api/articles/?limit=6&p=-1")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(6);
+            expect(response.body.total_count).toBe("13");
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
+            });
+          });
+      });
+      test("if queried limit is below 1 defaults to 10", () => {
+        return request(app)
+          .get("/api/articles/?limit=-6&p=1")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles;
+            expect(articles.length).toBe(10);
+            expect(response.body.total_count).toBe("13");
+            articles.forEach((article) => {
+              expect(article.body).toBeFalsy();
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
               });
             });
           });
