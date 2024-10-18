@@ -18,10 +18,10 @@ function getArticlesId(request, response, next) {
 }
 
 function getAllArticles(request, response, next) {
-  const { sort_order, sort_by, topic } = request.query;
-  return selectAllArticles(sort_order, sort_by, topic)
+  const { sort_order, sort_by, topic, limit, p } = request.query;
+  return selectAllArticles(sort_order, sort_by, topic, limit, p)
     .then((results) => {
-      response.status(200).send({ articles: results });
+      response.status(200).send(results);
     })
     .catch((err) => {
       next(err);

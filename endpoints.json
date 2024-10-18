@@ -10,8 +10,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles. Limit query specifies size of page and p query specifies which page. Page defaults to page 1 if query is blank and to final page if query exceeds total page number. Limit determines the number of articles per page, defaults to 10 if unspecified or below 1. sort_by and order queries determine which column the results are order by and whether it is ascending or descending. Topic query filters out all articles not of that topic.",
+    "queries": ["topic", "sort_by", "order", "p", "limit"],
     "exampleResponse": {
       "articles": [
         {
@@ -24,7 +24,8 @@
           "comment_count": 6
         }
       ]
-    }
+    },
+    "total_count": 1
   },
   "GET /api/articles/:article_id": {
     "description": "serves specified article, includes comment count, does not include body",

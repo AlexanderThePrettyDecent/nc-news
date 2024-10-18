@@ -27,7 +27,33 @@ function selectArticlesId(articleID) {
     });
 }
 
-function selectAllArticles(sortOrder = "DESC", sortBy = "created_at", topic) {
+function totalArticleNumber(topic) {
+  const insert = [];
+  let where = " ";
+  if (topic) {
+    where = ` WHERE topic=$1`;
+    insert.push(topic);
+  }
+  return db
+    .query(
+      `SELECT
+        COUNT(article_id) AS total_count
+      FROM articles
+      ${where}`,
+      insert
+    )
+    .then((results) => {
+      return results.rows;
+    });
+}
+
+function selectAllArticles(
+  sortOrder = "DESC",
+  sortBy = "created_at",
+  topic,
+  limit = 10,
+  p = 1
+) {
   const validOrders = ["ASC", "DESC"];
   const validSortBy = [
     "author",
@@ -53,30 +79,50 @@ function selectAllArticles(sortOrder = "DESC", sortBy = "created_at", topic) {
     where = " WHERE topic=$1 ";
     insertArr.push(topic);
   }
-  return db
-    .query(
-      `
-        SELECT
-          articles.author,
-          articles.title, 
-          articles.article_id, 
-          articles.topic, 
-          articles.created_at, 
-          articles.votes, 
-          articles.article_img_url, 
-          COUNT(comments.comment_id) AS comment_count
-        FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        ${where}
-        GROUP BY articles.article_id
-        ORDER BY ${sortBy} ${sortOrder}`,
-      insertArr
-    )
+
+  return totalArticleNumber(topic)
+    .then((totalCount) => {
+      const total = Number(totalCount[0].total_count);
+      if (Math.ceil(total / limit) < p) {
+        p = Math.ceil(total / limit);
+      }
+      if (p < 1) {
+        p = 1;
+      }
+      if (limit < 1) {
+        limit = 10;
+      }
+      const offset = limit * (p - 1);
+      const mainQuery = db.query(
+        `
+            SELECT
+              articles.author,
+              articles.title, 
+              articles.article_id, 
+              articles.topic, 
+              articles.created_at, 
+              articles.votes, 
+              articles.article_img_url, 
+              COUNT(comments.comment_id) AS comment_count
+            FROM articles
+            LEFT JOIN comments ON articles.article_id = comments.article_id
+            ${where}
+            GROUP BY articles.article_id
+            ORDER BY ${sortBy} ${sortOrder}
+            LIMIT ${limit}
+            OFFSET ${offset}`,
+        insertArr
+      );
+      return Promise.all([mainQuery, totalCount]);
+    })
     .then((results) => {
-      if (results.rows.length === 0) {
+      if (results[0].rows.length === 0) {
         return Promise.reject({ status: 404, msg: "not found" });
       }
-      return results.rows;
+      const totalCount = results[1][0].total_count;
+      const articles = results[0].rows;
+      const output = { articles: articles, total_count: totalCount };
+      return output;
     });
 }
 
