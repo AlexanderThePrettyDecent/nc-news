@@ -34,7 +34,6 @@ function updateCommentVotes(commentID, requestBody) {
       if (!selectCommentById(commentID)) {
         return Promise.reject({ status: 404, msg: "not found" });
       }
-      console.log(results.rows[0]);
       return results.rows;
     });
 }
