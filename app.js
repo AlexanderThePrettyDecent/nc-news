@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { serverError, customError, psqlError } = require("./errorHandlers");
 const {
   articlesRouter,
@@ -9,6 +10,8 @@ const {
 const { commentsRouter } = require("./routers/comments.routers");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
